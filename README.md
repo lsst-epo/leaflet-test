@@ -1,19 +1,22 @@
 Mockup of using leaflet.js to display astronomical images
 ===
 
-This repo is a mockup of using the [leaflet.js][leaflet] GIS library to render
-tileized astronomical data in a web browser.
+This repo is a mockup of using the [leaflet.js](http://leafletjs.com/) GIS
+library to render tileized astronomical data in a web browser.
 
-The [Slippy map tilenames][slippy] tiling strategy is used due to leaflet.js'
-out of the box support for it.  The [Mercator][mercator] projection used by
-slippy map is unsuitable for navigation by sky coordinates and would need to be
-replaced for usage with properly registered data.
+The [Slippy map
+tilenames](http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames) tiling
+strategy is used due to leaflet.js' out of the box support for it.  The
+[Mercator](https://en.wikipedia.org/wiki/Mercator_projection) projection used
+by slippy map is unsuitable for navigation by sky coordinates and would need to
+be replaced for usage with properly registered data.
 
-The test data used is a [3 color mosaic][test image] created by @taxelrod that
-has been cut up into tiles at multiple resolutions.  Slippy map defines all
-tiles as 256x256 pixels and has the concept of a "zoom level".  Where zoom is
-an integer value that implies the total number of tiles at that level.  Eg., a
-zoom level of 3 has 2^3 == 16 tiles arranged in a 4x4 grid.
+The test data used is a [3 color
+mosaic](https://s3.amazonaws.com/lsst-epo/testdata/D4.rgb.q95.jpg) created by
+@taxelrod that has been cut up into tiles at multiple resolutions.  Slippy map
+defines all tiles as 256x256 pixels and has the concept of a "zoom level".
+Where zoom is an integer value that implies the total number of tiles at that
+level.  Eg., a zoom level of 3 has 2^3 == 16 tiles arranged in a 4x4 grid.
 
 The test image is cropped to 16384x16384 pixels so that it will evenly divide
 into powers of 2 numbers of tiles.  It is then scaled to 7 different zoom
@@ -25,8 +28,9 @@ Generating the Tiles
 
 No image data is committed to the repo.  A `makefile` is provided that will
 download the test image and process it into slippy map compatible tiles.  The
-[imagemagick][imagemagick] `convert` utility is required to generate the tiles
-and [`wget`][wget] is used to download the test image.
+[imagemagick](http://www.imagemagick.org/) `convert` utility is required to
+generate the tiles and [`wget`](https://www.gnu.org/software/wget/) is used to
+download the test image.
 
 the tiles will consume multiple gigabytes of resident memory. __Be sure that
 your system has enough available RAM__
@@ -93,7 +97,8 @@ Deploying to AWS s3
 
 ### Install s3cmd
 
-The [`s3cmd`][s3cmd] utility is a convenient tool for small scale interaction with s3.
+The [`s3cmd`](http://s3tools.org/s3cmd) utility is a convenient tool for small
+scale interaction with s3.
 
     yum install -y s3cmd
 
@@ -105,7 +110,7 @@ or
 
     s3cmd --configure
 
-See the [s3cmd-howto][s3cmd-howto] for details.
+See the [s3cmd-howto](http://s3tools.org/s3cmd-howto) for details.
 
 ### Push to s3
 
@@ -142,15 +147,3 @@ Behold s3 hosted demo
 ---
 
 http://epo-leaflet-test1.s3-website-us-east-1.amazonaws.com/
-
-See Also
----
-
-* [leaflet]: http://leafletjs.com/
-* [slippy]: http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-* [test image]: https://s3.amazonaws.com/lsst-epo/testdata/D4.rgb.q95.jpg
-* [mercator]: https://en.wikipedia.org/wiki/Mercator_projection
-* [imagemagick]: http://www.imagemagick.org/
-* [wget]: https://www.gnu.org/software/wget/
-* [s3cmd]: http://s3tools.org/s3cmd
-* [s3cmd-howto]: http://s3tools.org/s3cmd-howto
