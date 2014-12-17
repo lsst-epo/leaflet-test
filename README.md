@@ -15,8 +15,9 @@ The test data used is a [3 color
 mosaic](https://s3.amazonaws.com/lsst-epo/testdata/D4.rgb.q95.jpg) created by
 @taxelrod that has been cut up into tiles at multiple resolutions.  Slippy map
 defines all tiles as 256x256 pixels and has the concept of a "zoom level".
-Where zoom is an integer value that implies the total number of tiles at that
-level.  Eg., a zoom level of 3 has 2^3 == 16 tiles arranged in a 4x4 grid.
+Where zoom is an integer value that implies the number of tiles per side on a
+square grid.  Eg., a zoom level of 3 has 2^3 == 8 tiles per dimension arranged
+in a 8x8 grid.
 
 The test image is cropped to 16384x16384 pixels so that it will evenly divide
 into powers of 2 numbers of tiles.  It is then scaled to 7 different zoom
