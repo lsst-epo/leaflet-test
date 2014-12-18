@@ -119,32 +119,110 @@ Create a new s3 bucket to host the mockup and push the repo + generated tiles
 to it.
 
 ```shell
-[master] ~/epo/maptest/leaflet-test $ s3cmd mb s3://epo-leaflet-test1
-Bucket 's3://epo-leaflet-test1/' created
-[master] ~/epo/maptest/leaflet-test $ s3cmd sync --acl-public . s3://epo-leaflet-test1
-./.README.md.swp -> s3://epo-leaflet-test1/.README.md.swp  [1 of 5291]
+[master] ~/epo/maptest/leaflet-test $ s3cmd mb s3://leaflet-test.lsst.pics
+Bucket 's3://leaflet-test.lsst.pics/' created
+[master] ~/epo/maptest/leaflet-test $ s3cmd sync --acl-public . s3://leaflet-test.lsst.pics
+./.README.md.swp -> s3://leaflet-test.lsst.pics/.README.md.swp  [1 of 5291]
  12288 of 12288   100% in    0s    74.50 kB/s  done
-./app.js -> s3://epo-leaflet-test1/app.js  [2 of 5291]
+./app.js -> s3://leaflet-test.lsst.pics/app.js  [2 of 5291]
  142 of 142   100% in    0s   983.44 B/s  done
-./img/0/foo_0_0.jpg -> s3://epo-leaflet-test1/img/0/foo_0_0.jpg  [3 of 5291]
+./img/0/foo_0_0.jpg -> s3://leaflet-test.lsst.pics/img/0/foo_0_0.jpg  [3 of 5291]
  20887 of 20887   100% in    0s    91.76 kB/s  done
 ...
 ```
 
-Enable s3 website hosting
----
+### Enable s3 website hosting
 
 ```shell
-[master] ~/epo/maptest/leaflet-test $ s3cmd ws-create s3://epo-leaflet-test1
-Bucket 's3://epo-leaflet-test1/': website configuration created.
-[master] ~/epo/maptest/leaflet-test $ s3cmd ws-info s3://epo-leaflet-test1
-Bucket s3://epo-leaflet-test1/: Website configuration
-Website endpoint: http://epo-leaflet-test1.s3-website-us-east-1.amazonaws.com/
+[master] ~/epo/maptest/leaflet-test $ s3cmd ws-create s3://leaflet-test.lsst.pics
+Bucket 's3://leaflet-test.lsst.pics/': website configuration created.
+[master] ~/epo/maptest/leaflet-test $ s3cmd ws-info s3://leaflet-test.lsst.pics
+Bucket s3://leaflet-test.lsst.pics/: Website configuration
+Website endpoint: http://leaflet-test.lsst.pics.s3-website-us-east-1.amazonaws.com/
 Index document:   index.html
 Error document:   None
 ```
 
-Behold s3 hosted demo
+### Behold s3 hosted demo
+
+http://leaflet-test.lsst.pics.s3-website-us-east-1.amazonaws.com/
+
+
+Configuring AWS cloudfront as a CDN in front of s3
 ---
 
-http://epo-leaflet-test1.s3-website-us-east-1.amazonaws.com/
+### Create cloudfront distribution
+
+Cloudfront does not support s3/website style directory indexing but a default
+"root-object" can be set as a relative path from the root of the s3 bucket
+backing the distribution.
+
+```shell
+[master] ~/epo/maptest/leaflet-test $ s3cmd cfcreate  --cf-default-root-object=index.html --cf-add-cname=leaflet-test.lsst.pics s3://leaflet-test.lsst.pics
+Distribution created:
+Origin:         s3://leaflet-test.lsst.pics/
+DistId:         cf://E325F0BV1X37A1
+DomainName:     d2cnlrurnhvdn0.cloudfront.net
+CNAMEs:         leaflet-test.lsst.pics
+Comment:        http://leaflet-test.lsst.pics.s3.amazonaws.com/
+Status:         InProgress
+Enabled:        True
+DefaultRootObject: index.html
+Etag:           E10NA2GD9016CU
+```
+
+The distribution can take some time to become avaiable (> 15min).  The state
+can be checked with the `cfinfo` subcommand.
+
+```shell
+[master] ~/epo/maptest/leaflet-test $ s3cmd cfinfo s3://leaflet-test.lsst.pics
+Origin:         s3://leaflet-test.lsst.pics/
+DistId:         cf://E325F0BV1X37A1
+DomainName:     d2cnlrurnhvdn0.cloudfront.net
+CNAMEs:         leaflet-test.lsst.pics
+Status:         InProgress
+Comment:        http://leaflet-test.lsst.pics.s3.amazonaws.com/
+Enabled:        True
+DfltRootObject: index.html
+Logging:        Disabled
+Etag:           E10NA2GD9016CU
+```
+
+The `Status:` value will eventually change to `Deployed`.
+
+```shell
+[master] ~/epo/maptest/leaflet-test $ s3cmd cfinfo s3://leaflet-test.lsst.pics
+Origin:         s3://leaflet-test.lsst.pics/
+DistId:         cf://E325F0BV1X37A1
+DomainName:     d2cnlrurnhvdn0.cloudfront.net
+CNAMEs:         leaflet-test.lsst.pics
+Status:         Deployed
+Comment:        http://leaflet-test.lsst.pics.s3.amazonaws.com/
+Enabled:        True
+DfltRootObject: index.html
+Logging:        Disabled
+Etag:           E10NA2GD9016CU
+```
+
+### Create CNAME for cloudfront distribution
+
+```shell
+[master] ~/epo/maptest/leaflet-test $ dig leaflet-test.lsst.pics +answer +noquestion +nostats +nocomments
+
+; <<>> DiG 9.9.4-P2-RedHat-9.9.4-16.P2.fc20 <<>> leaflet-test.lsst.pics +answer +noquestion +nostats +nocomments
+;; global options: +cmd
+leaflet-test.lsst.pics. 111 IN  CNAME   d2cnlrurnhvdn0.cloudfront.net.
+d2cnlrurnhvdn0.cloudfront.net. 9 IN A   54.192.137.123
+d2cnlrurnhvdn0.cloudfront.net. 9 IN A   54.192.137.130
+d2cnlrurnhvdn0.cloudfront.net. 9 IN A   54.230.138.49
+d2cnlrurnhvdn0.cloudfront.net. 9 IN A   54.230.138.188
+d2cnlrurnhvdn0.cloudfront.net. 9 IN A   54.230.136.199
+d2cnlrurnhvdn0.cloudfront.net. 9 IN A   54.192.137.128
+d2cnlrurnhvdn0.cloudfront.net. 9 IN A   54.230.138.79
+d2cnlrurnhvdn0.cloudfront.net. 9 IN A   54.192.137.
+```
+
+### Behold cloudfront "distributed" / s3 hosted demo
+
+http://leaflet-test.lsst.pics/
+
