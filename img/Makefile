@@ -1,4 +1,4 @@
-BUILD_DIR=.
+BUILD_DIR=../app/images/tiles/
 ZOOMS=0 1 2 3 4 5 6
 ZOOM_DIRS=$(patsubst %, $(BUILD_DIR)/%, $(ZOOMS))
 
