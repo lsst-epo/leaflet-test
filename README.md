@@ -31,14 +31,15 @@ No image data is committed to the repo.  A `makefile` is provided that will
 download the test image and process it into slippy map compatible tiles.  The
 [imagemagick](http://www.imagemagick.org/) `convert` utility is required to
 generate the tiles and [`wget`](https://www.gnu.org/software/wget/) is used to
-download the test image.
+download the test image.  The generated tiles will be under the path
+`./app/images/tiles/`.
 
 the tiles will consume multiple gigabytes of resident memory. __Be sure that
 your system has enough available RAM__
 
 ```
-git clone git@github.com:LSST-EPO/leaflet-test.git
-cd leaflet-test/img
+git clone git@github.com:lsst-epo/leaflet-test.git
+cd leaflet-test/mktiles
 make
 ```
 
@@ -65,20 +66,20 @@ convert squared-4.jpg -resize 2048x2048 squared-3.jpg
 convert squared-3.jpg -resize 1024x1024 squared-2.jpg
 convert squared-2.jpg -resize 512x512 squared-1.jpg
 convert squared-1.jpg -resize 256x256 squared-0.jpg
-mkdir -p 0
-convert squared-0.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin 0/'foo_%[filename:tile].jpg'
-mkdir -p 1
-convert squared-1.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin 1/'foo_%[filename:tile].jpg'
-mkdir -p 2
-convert squared-2.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin 2/'foo_%[filename:tile].jpg'
-mkdir -p 3
-convert squared-3.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin 3/'foo_%[filename:tile].jpg'
-mkdir -p 4
-convert squared-4.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin 4/'foo_%[filename:tile].jpg'
-mkdir -p 5
-convert squared-5.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin 5/'foo_%[filename:tile].jpg'
-mkdir -p 6
-convert squared-6.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin 6/'foo_%[filename:tile].jpg'
+mkdir -p ../app/images/tiles/0
+convert squared-0.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin ../app/images/tiles/0/'foo_%[filename:tile].jpg'
+mkdir -p ../app/images/tiles/1
+convert squared-1.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin ../app/images/tiles/1/'foo_%[filename:tile].jpg'
+mkdir -p ../app/images/tiles/2
+convert squared-2.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin ../app/images/tiles/2/'foo_%[filename:tile].jpg'
+mkdir -p ../app/images/tiles/3
+convert squared-3.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin ../app/images/tiles/3/'foo_%[filename:tile].jpg'
+mkdir -p ../app/images/tiles/4
+convert squared-4.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin ../app/images/tiles/4/'foo_%[filename:tile].jpg'
+mkdir -p ../app/images/tiles/5
+convert squared-5.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin ../app/images/tiles/5/'foo_%[filename:tile].jpg'
+mkdir -p ../app/images/tiles/6
+convert squared-6.jpg -crop 256x256 -set filename:tile '%[fx:page.x/256]_%[fx:page.y/256]' +repage +adjoin ../app/images/tiles/6/'foo_%[filename:tile].jpg'
 ```
 
 
@@ -92,6 +93,65 @@ can be viewed directly with a local web browser. Eg.,
 [master] ~/tmp/leaflet-test $ firefox index.html 
 ```
 
+### EL 7
+```
+# rhel7/ami only
+sudo yum --enablerepo=rhui-REGION-rhel-server-optional install -y c-ares-devel
+
+sudo yum install -y https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+sudo yum clean all
+sudo yum update -y
+sudo yum install -y git bzip2 wget npm nodejs-grunt-cli ImageMagick
+sudo yum install -y fontconfig # needed by phantomjs
+
+```
+
+### Ubuntu 14.04
+```
+sudo apt-get update
+sudo apt-get install -y git nodejs npm imagemagick nodejs-legacy
+
+sudo npm install -g grunt-cli
+sudo chown -R ubuntu:ubuntu tmp
+```
+
+### Common
+```
+sudo npm install -g jshint
+sudo npm install -g bower
+
+git clone git@github.com:lsst-epo/leaflet-test.git
+cd leaflet-test
+npm install
+bower install
+grunt
+# force if mocha hangs
+# grunt --force
+(cd mktiles; make)
+grunt server
+```
+
+If your running on an ec2 instance/etc. and want to remotely connect you must
+open inbound traffic to tcp port 9000 and edit the Gruntfile.js as follows:
+
+```
+diff --git a/Gruntfile.js b/Gruntfile.js
+index 8899c48..89198db 100644
+--- a/Gruntfile.js
++++ b/Gruntfile.js
+@@ -49,7 +49,7 @@ module.exports = function (grunt) {
+       options: {
+         port: 9000,
+         // change this to '0.0.0.0' to access the server from outside
+-        hostname: 'localhost',
++        hostname: '0.0.0.0',
+         livereload: 35729
+       },
+       livereload: {
+```
+
+Notes below this point are out of date
+===
 
 Deploying to AWS s3
 ---
