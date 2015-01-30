@@ -1,0 +1,11 @@
+{
+  "type": "Feature",
+  "properties": {
+    "name": "zero,zero",
+    "popupContent": "Center of the universe!"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [0, 0]
+  }
+}
