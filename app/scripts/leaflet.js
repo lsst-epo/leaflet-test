@@ -1,5 +1,15 @@
 'use strict';
 
+var map = L.map('map').setView([1.0, 1.0], 0);
+
+L.tileLayer('./images/tiles/{z}/foo_{x}_{y}.jpg', {
+  maxZoom: 6,
+  id: 'epo-test1',
+  noWrap: true,
+}).addTo(map);
+
+var geogroup = L.layerGroup().addTo(map);
+
 // geojson usage based on
 // http://leafletjs.com/examples/geojson.html
 
@@ -20,30 +30,42 @@ var geojsonMarkerOptions = {
   fillOpacity: 0
 };
 
-var geojsonFeature = {
-  'type': 'Feature',
-  'properties': {
-    'name': 'zero,zero',
-    'popupContent': 'Center of the universe!',
-  },
-  'geometry': {
-    'type': 'Point',
-    'coordinates': [0, 0],
+// based on this example:
+// http://www.html5rocks.com/en/tutorials/file/dndfiles/
+function handleFileSelect(evt) {
+  var files = evt.target.files; // FileList object
+
+  var reader = new FileReader();
+
+  reader.onload = function(e) {
+    // Print the contents of the file
+    var text = e.target.result;
+
+    var geoj = JSON.parse(text);
+    console.log(geoj);
+
+    geogroup.addLayer(L.geoJson(geoj, {
+        onEachFeature: onEachFeature,
+        // the pointToLayer callback overrides the default "pins" drawn for points
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, geojsonMarkerOptions);
+        },
+      })
+    );
+  };
+
+  // files is a FileList of File objects. List some properties.
+  for (var i = 0, f; f = files[i]; i++) {
+    reader.readAsText(f, 'UTF-8');
   }
-};
+}
 
-var map = L.map('map').setView([1.0, 1.0], 0);
+function clearGeo() {
+  geogroup.clearLayers();
+}
 
-L.tileLayer('./images/tiles/{z}/foo_{x}_{y}.jpg', {
-  maxZoom: 6,
-  id: 'epo-test1',
-  noWrap: true,
-}).addTo(map);
-
-L.geoJson(geojsonFeature, {
-  onEachFeature: onEachFeature,
-  // the pointToLayer callback overrides the default "pins" drawn for points
-  pointToLayer: function (feature, latlng) {
-    return L.circleMarker(latlng, geojsonMarkerOptions);
-  },
-}).addTo(map);
+$(document).ready(function() {
+  $('.geo-wrapper .btn-file :file').bind('change', handleFileSelect);
+  //$('.file-wrapper button[type=button]').bind('click', clearGeo);
+  $('.geo-wrapper .btn-clear').bind('click', clearGeo);
+});
