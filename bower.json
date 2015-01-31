@@ -6,8 +6,7 @@
     "modernizr": "~2.6.2",
     "jquery": "~1.9.1",
     "leaflet": "~0.7.3",
-    "proj4leaflet": "~0.7.0"
+    "proj4leaflet": "8f0a3eb75f"
   },
   "devDependencies": {}
 }
-
