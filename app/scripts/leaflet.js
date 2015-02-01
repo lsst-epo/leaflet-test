@@ -10,6 +10,8 @@ var projCenterLat = -17.17710;
 var projCenterLong = 334.42908;
 var projString = '+proj=gnom +lat_0=' + projCenterLat + ' +lon_0=' + projCenterLong +' +x_0=0 +y_0=0';
 
+proj4.defs("urn:ogc:def:crs:d4", projString);
+
 // ra, dec are for the upper left corner of image
 var xform = new L.Transformation(-1, -17.17710, -1, 334.42908);
 
@@ -78,7 +80,7 @@ function handleFileSelect(evt) {
     var geoj = JSON.parse(text);
     console.log(geoj);
 
-    geogroup.addLayer(L.geoJson(geoj, {
+    geogroup.addLayer(L.Proj.geoJson(geoj, {
         onEachFeature: onEachFeature,
         // the pointToLayer callback overrides the default "pins" drawn for points
         pointToLayer: function (feature, latlng) {
