@@ -20,5 +20,5 @@
     "smarttabs": true,
     "jquery": true,
     "white": true,
-    "predef": [ "L" ]
+    "predef": [ "L", "proj4" ]
 }
