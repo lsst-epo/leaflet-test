@@ -10,7 +10,7 @@ var projCenterLat = -17.17710;
 var projCenterLong = 334.42908;
 var projString = '+proj=gnom +lat_0=' + projCenterLat + ' +lon_0=' + projCenterLong +' +x_0=0 +y_0=0';
 
-proj4.defs("urn:ogc:def:crs:d4", projString);
+proj4.defs('urn:ogc:def:crs:d4', projString);
 
 // ra, dec are for the upper left corner of image
 var xform = new L.Transformation(-1, -17.17710, -1, 334.42908);
@@ -91,8 +91,8 @@ function handleFileSelect(evt) {
   };
 
   // files is a FileList of File objects. List some properties.
-  for (var i = 0, f; f = files[i]; i++) {
-    reader.readAsText(f, 'UTF-8');
+  for (var i = 0; i < files.length; i++) {
+    reader.readAsText(files[i], 'UTF-8');
   }
 }
 
