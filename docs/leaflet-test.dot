@@ -1,0 +1,23 @@
+digraph overlay_current
+{
+  dpi=100
+//  size="16,12!"
+  ranksep=1.5
+//  nodesep=1.5
+  rankdir=TB
+  overlap=false
+  clusterrank=local
+  compound=true
+  newrank=true
+
+  node [shape=ellipse fontsize=10 style=filled fillcolor=white]
+
+  color=gray
+  fontsize=24
+  style=bold
+
+  cf [label="AWS CloudFront"]
+  s3 [label="AWS S3"]
+
+  cf -> s3
+}
